@@ -19,8 +19,6 @@ public class TeleYohan extends LinearOpMode {
 //
     Follower follower;
 
-
-
     @Override
     public void runOpMode() {
         launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry);
