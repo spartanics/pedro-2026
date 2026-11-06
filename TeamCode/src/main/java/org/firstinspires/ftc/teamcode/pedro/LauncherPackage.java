@@ -75,9 +75,9 @@ public class LauncherPackage {
         return Command.build()
                 .setStart(() -> {
                     // executed on start
+                    feeder.setPower(1);
                 })
                 .setExecute(() -> {
-                    feeder.setPower(1);
                 })
                 .setDone(() -> {
                     // return timer.
