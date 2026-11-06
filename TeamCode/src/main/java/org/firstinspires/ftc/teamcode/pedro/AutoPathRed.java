@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pedro;
 
 import com.pedropathing.api.Paths;
 
@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.pedropathing.paths.interpolator.Interpolator;
 
-@Autonomous(name = "AutoPath", group = "Autonomous")
+@Autonomous
 public class AutoPathRed extends LinearOpMode {
 
     private Follower follower;
