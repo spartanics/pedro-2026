@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
 import static com.pedropathing.ivy.commands.Commands.waitMs;
-import static com.pedropathing.ivy.groups.Groups.loop;
 import static com.pedropathing.ivy.groups.Groups.sequential;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.pedropathing.ivy.Command;
-import com.pedropathing.ivy.Scheduler;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -28,14 +24,16 @@ public class LauncherPackage {
 
     private Command goLaunch;
     private Telemetry telemetry;
+    private Aim aim;
 
-    public LauncherPackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry) {
+    public LauncherPackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry, Aim aim) {
         this.launcher = hardwareMap.get(DcMotorEx.class,"launcher");
 //        this.hood = hardwareMap.get(Servo.class, "hood");
         this.turret = hardwareMap.get(Servo.class, "turret");
         this.feeder = hardwareMap.get(CRServo.class, "feeder");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
+        this.aim = aim;
 
         this.goLaunch = totalLaunch();
 
@@ -60,12 +58,15 @@ public class LauncherPackage {
         return Command.build()
                 .setStart(() -> {
                     // executed on start
+                    // call aim.getRelativePosition() to get the x, y, z
                 })
                 .setExecute(() -> {
+                    // move to the turret
 //                Aim.hone(); //centers the hive into the middle
                 })
                 .setDone(() -> {
                     // return true to end the command
+                    // when getRelativePosition() is within tolerance
                     return true;
 //                return Aim.aligned(); //return true when aim is centered
                 });

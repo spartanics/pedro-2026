@@ -19,6 +19,8 @@ import com.pedropathing.paths.interpolator.Interpolator;
 public class AutoPathBlue extends LinearOpMode {
 
     private Follower follower;
+    private LauncherPackage launcher;
+    private Aim aim;
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
@@ -28,16 +30,20 @@ public class AutoPathBlue extends LinearOpMode {
     private final Pose point1Segment1End = poseFactory.of(82.9835, 133.637, 0);
     private final Pose point2 = poseFactory.of(82.8114, 115.3467, 89.461);
 
+
     // Autonomous routine
     public Command autoRoutine() {
         return sequential(
                 follow(follower, path1()),
+                shoot(),
                 follow(follower, path2())
         );
     }
 
     @Override
     public void runOpMode() {
+        aim = new Aim(hardwareMap, telemetry);
+        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim);
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
@@ -49,6 +55,8 @@ public class AutoPathBlue extends LinearOpMode {
         while (opModeIsActive()) {
             follower.update();
             Scheduler.execute();
+            aim.update();
+            launcher.update();
 
             telemetry.addData("x", follower.pose().x());
             telemetry.addData("y", follower.pose().y());
@@ -69,5 +77,10 @@ public class AutoPathBlue extends LinearOpMode {
 
     public Path path2() {
         return Paths.line(point1, point2).reverseTangent();
+    }
+
+    public Command shoot() {
+        // return a command that does the state machine to go shoot
+        return launcher.totalLaunch();
     }
 }

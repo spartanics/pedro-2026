@@ -14,14 +14,17 @@ import static com.pedropathing.ivy.commands.Commands.*;
 public class TeleYohan extends LinearOpMode {
 
     LauncherPackage launcher;
-//    Aim aim;
-//    IntakePackage intake;
+    Aim aim;
+    IntakePackage intake;
 //
     Follower follower;
 
     @Override
     public void runOpMode() {
-        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry);
+        aim = new Aim(hardwareMap, telemetry);
+        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim);
+
+        intake = new IntakePackage(hardwareMap, gamepad1, telemetry);
         //Since the scheduler is static, we need to reset it before each OpMode
         //so commands don't carry over from one OpMode to the next
         Scheduler.reset();
@@ -58,6 +61,8 @@ public class TeleYohan extends LinearOpMode {
             // Run the scheduler each loop
             Scheduler.execute();
             launcher.update();
+            intake.update();
+            aim.update();
             follower.drivetrain.drive(new DrivePowers(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x), true);
             telemetry.addLine("fresh");
             telemetry.update();
