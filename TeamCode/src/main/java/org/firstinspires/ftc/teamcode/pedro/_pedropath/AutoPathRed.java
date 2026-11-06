@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.pedropathing.paths.interpolator.Interpolator;
 
+import org.firstinspires.ftc.teamcode.pedro.Constants;
+
 @Autonomous(name = "AutoPath", group = "Autonomous")
 public class AutoPathRed extends LinearOpMode {
 
