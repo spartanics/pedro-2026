@@ -16,7 +16,7 @@ public class LauncherPackage {
 
     private DcMotorEx launcher;
     private Servo hood;
-    private Servo turret;
+    private CRServo turret;
     private CRServo feeder;
     private double velocity = 1700;
 
@@ -29,7 +29,7 @@ public class LauncherPackage {
     public LauncherPackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry, Aim aim) {
         this.launcher = hardwareMap.get(DcMotorEx.class,"launcher");
 //        this.hood = hardwareMap.get(Servo.class, "hood");
-        this.turret = hardwareMap.get(Servo.class, "turret");
+        this.turret = hardwareMap.get(CRServo.class, "turret");
         this.feeder = hardwareMap.get(CRServo.class, "feeder");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
@@ -59,16 +59,24 @@ public class LauncherPackage {
                 .setStart(() -> {
                     // executed on start
                     // call aim.getRelativePosition() to get the x, y, z
+                    double[] currentPose = aim.getRelativePosition();
+
                 })
                 .setExecute(() -> {
                     aim.getRelativePosition();
                     // move to the turret
 //                Aim.hone(); //centers the hive into the middle
+                    turret.setPower(aim.getX());
                 })
                 .setDone(() -> {
                     // return true to end the command
                     // when getRelativePosition() is within tolerance
-                    return true;
+                    if(Math.abs(aim.getX()) < 0.5) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
 //                return Aim.aligned(); //return true when aim is centered
                 });
     }

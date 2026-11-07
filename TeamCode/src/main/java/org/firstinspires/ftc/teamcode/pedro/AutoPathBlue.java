@@ -9,6 +9,8 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -35,7 +37,7 @@ public class AutoPathBlue extends LinearOpMode {
     public Command autoRoutine() {
         return sequential(
                 follow(follower, path1()),
-                shoot(),
+                launcher.totalLaunch(),
                 follow(follower, path2())
         );
     }
@@ -79,8 +81,5 @@ public class AutoPathBlue extends LinearOpMode {
         return Paths.line(point1, point2).reverseTangent();
     }
 
-    public Command shoot() {
-        // return a command that does the state machine to go shoot
-        return launcher.totalLaunch();
+
     }
-}

@@ -61,4 +61,8 @@ public class Aim {
         // will return true only if april tag is in sight.
         return true;
     }
+
+    public double getX() {
+        return x;
+    }
 }
