@@ -61,6 +61,7 @@ public class LauncherPackage {
                     // call aim.getRelativePosition() to get the x, y, z
                 })
                 .setExecute(() -> {
+                    aim.getRelativePosition();
                     // move to the turret
 //                Aim.hone(); //centers the hive into the middle
                 })
