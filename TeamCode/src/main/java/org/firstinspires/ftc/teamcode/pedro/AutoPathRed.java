@@ -43,8 +43,8 @@ public class AutoPathRed extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        aim = new Aim(hardwareMap, telemetry);
-        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim);
+        aim = new Aim(hardwareMap, telemetry, Constants.TeleopMode.RED);
+        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim, Constants.TeleopMode.RED);
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
