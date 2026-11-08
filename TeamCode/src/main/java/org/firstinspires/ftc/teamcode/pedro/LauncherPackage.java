@@ -135,6 +135,7 @@ public class LauncherPackage {
                 goLaunch.cancel();
             }
             launcher.setVelocity(0);
+            feeder.setPower(0);
         }
 
         if (gamepad.dpadDownWasPressed()) {
