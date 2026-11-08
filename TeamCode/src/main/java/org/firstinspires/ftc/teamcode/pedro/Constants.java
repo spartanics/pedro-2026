@@ -20,6 +20,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class Constants {
 
 
+    enum TeleopMode {
+        BLUE,
+        RED,
+        NOT_SET
+    }
+
+
 
 
 

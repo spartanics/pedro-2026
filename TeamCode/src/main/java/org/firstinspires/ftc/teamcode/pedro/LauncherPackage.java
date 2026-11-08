@@ -16,7 +16,7 @@ public class LauncherPackage {
 
     private DcMotorEx launcher;
     private Servo hood;
-    private CRServo turret;
+    private Servo turret;
     private CRServo feeder;
     private double velocity = 1700;
 
@@ -26,16 +26,19 @@ public class LauncherPackage {
     private Telemetry telemetry;
     private Aim aim;
 
-    public LauncherPackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry, Aim aim) {
+
+    public LauncherPackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry, Aim aim, Constants.TeleopMode teleopMode) {
         this.launcher = hardwareMap.get(DcMotorEx.class,"launcher");
 //        this.hood = hardwareMap.get(Servo.class, "hood");
-        this.turret = hardwareMap.get(CRServo.class, "turret");
+        this.turret = hardwareMap.get(Servo.class, "turret");
         this.feeder = hardwareMap.get(CRServo.class, "feeder");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
         this.aim = aim;
 
         this.goLaunch = totalLaunch();
+        turret.setDirection(Servo.Direction.REVERSE);
+        turret.setPosition(.5);
 
 
     }
@@ -63,14 +66,14 @@ public class LauncherPackage {
 
                 })
                 .setExecute(() -> {
+                    aim.getRelativePosition();
                     // move to the turret
 //                Aim.hone(); //centers the hive into the middle
-                    turret.setPower(aim.getX());
                 })
                 .setDone(() -> {
                     // return true to end the command
                     // when getRelativePosition() is within tolerance
-                    if(Math.abs(aim.getX()) < 0.5) {
+                    if(Math.abs(aim.getXDegrees()) < 5) {
                         return true;
                     }
                     else {
@@ -103,7 +106,21 @@ public class LauncherPackage {
         );
     }
 
+    public void correctTurret() {
+        double error = aim.getXDegrees();
+        // if negative move to the left
+        // if positive move to the right
+        double k_p = 0.0005; //0.0001
+        double movement = k_p * error;
+        double pos = turret.getPosition() + movement;
+        pos = Math.max(Math.min(pos, 1), 0);
+
+        turret.setPosition(pos);
+    }
+
     public void update() {
+        correctTurret();
+
         if (gamepad.yWasPressed()) {
             if (goLaunch.isScheduled()) {
                 telemetry.addLine("goLaunch has been scheduled");
@@ -112,7 +129,12 @@ public class LauncherPackage {
 //                Scheduler.schedule(goLaunch);
                 telemetry.addLine("schedule goLaunch");
             }
-
+        }
+        if(gamepad.xWasPressed()) {
+            if(goLaunch.isScheduled()) {
+                goLaunch.cancel();
+            }
+            launcher.setVelocity(0);
         }
 
         if (gamepad.dpadDownWasPressed()) {
@@ -130,6 +152,7 @@ public class LauncherPackage {
         }
 
         telemetry.addLine("launcher.update");
+        telemetry.addData("turret position: ","%.2f", turret.getPosition());
         telemetry.addData("velocity: ", "%.0f", velocity);
     }
 }

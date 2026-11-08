@@ -44,8 +44,8 @@ public class AutoPathBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        aim = new Aim(hardwareMap, telemetry);
-        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim);
+        aim = new Aim(hardwareMap, telemetry, Constants.TeleopMode.BLUE);
+        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim, Constants.TeleopMode.BLUE);
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
