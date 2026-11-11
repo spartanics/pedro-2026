@@ -39,7 +39,13 @@ public class Aim {
 
 
     public void update() {
-        limelight.pipelineSwitch(0);
+        if (this.teleopMode == Constants.TeleopMode.RED ) {
+            limelight.pipelineSwitch(2);
+        }
+        if (this.teleopMode == Constants.TeleopMode.BLUE) {
+            limelight.pipelineSwitch(0);
+        }
+
         getRelativePosition();
     }
 
