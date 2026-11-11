@@ -6,6 +6,7 @@ import static com.pedropathing.ivy.groups.Groups.sequential;
 import com.pedropathing.ivy.Command;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,6 +19,7 @@ public class LauncherPackage {
     private Servo hood;
     private Servo turret;
     private CRServo feeder;
+    private CRServo back_feed;
     private double velocity = 1700;
 
     private Gamepad gamepad;
@@ -32,6 +34,7 @@ public class LauncherPackage {
 //        this.hood = hardwareMap.get(Servo.class, "hood");
         this.turret = hardwareMap.get(Servo.class, "turret");
         this.feeder = hardwareMap.get(CRServo.class, "feeder");
+        this.back_feed = hardwareMap.get(CRServo.class, "back_feed");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
         this.aim = aim;
@@ -39,6 +42,7 @@ public class LauncherPackage {
         this.goLaunch = totalLaunch();
         turret.setDirection(Servo.Direction.REVERSE);
         turret.setPosition(.5);
+        back_feed.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
     }
@@ -88,6 +92,7 @@ public class LauncherPackage {
                 .setStart(() -> {
                     // executed on start
                     feeder.setPower(1);
+                    back_feed.setPower(1);
                 })
                 .setExecute(() -> {
                 })
@@ -101,8 +106,8 @@ public class LauncherPackage {
         return sequential(
                 rotating(),
                 launching(),
-                feeding(),
-                waitMs(5000)
+                feeding()
+                //waitMs(5000)
         );
     }
 
@@ -136,6 +141,7 @@ public class LauncherPackage {
             }
             launcher.setVelocity(0);
             feeder.setPower(0);
+            back_feed.setPower(0);
         }
 
         if (gamepad.dpadDownWasPressed()) {
