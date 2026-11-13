@@ -24,7 +24,7 @@ public class LauncherPackage {
 
     private Gamepad gamepad;
 
-    private Command goLaunch;
+    private Command teleGoLaunch;
     private Telemetry telemetry;
     private Aim aim;
 
@@ -39,7 +39,7 @@ public class LauncherPackage {
         this.telemetry = telemetry;
         this.aim = aim;
 
-        this.goLaunch = totalLaunch();
+        this.teleGoLaunch = totalLaunch();
         turret.setDirection(Servo.Direction.REVERSE);
         turret.setPosition(.5);
         back_feed.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -61,7 +61,21 @@ public class LauncherPackage {
                 });
     }
 
-    public Command rotating() {
+    public Command stopLaunching() {
+        return Command.build()
+                .setStart(() -> {
+                    // executed on start
+                })
+                .setExecute(() -> {
+                    launcher.setVelocity(0);
+                })
+                .setDone(() -> {
+                    // return true to end the command
+                    return true;
+                });
+    }
+
+    /*public Command rotating() {
         return Command.build()
                 .setStart(() -> {
                     // executed on start
@@ -85,7 +99,7 @@ public class LauncherPackage {
                     }
 //                return Aim.aligned(); //return true when aim is centered
                 });
-    }
+    }*/
 
     public Command feeding() {
         return Command.build()
@@ -102,16 +116,59 @@ public class LauncherPackage {
                 });
     }
 
+    public Command stopFeeding() {
+        return Command.build()
+                .setStart(() -> {
+                    // executed on start
+                    feeder.setPower(0);
+                    back_feed.setPower(0);
+                })
+                .setExecute(() -> {
+                })
+                .setDone(() -> {
+                    // return timer.
+                    return true; //return true after 5s?
+                });
+    }
+
+    public Command turretCorrecting() {
+        return Command.build()
+                .setStart(() -> {
+                    // executed on start
+                })
+                .setExecute(() -> {
+                    correctTurret();
+                })
+                .setDone(() -> {
+                    // return timer.
+                    return true;
+                });
+    }
+
     public Command totalLaunch() {
         return sequential(
-                rotating(),
+                //rotating(),
                 launching(),
                 feeding()
                 //waitMs(5000)
         );
     }
 
+    public Command autoTotalLaunch() {
+        return sequential(
+                //rotating(),
+                launching(),
+                feeding(),
+                waitMs(5000),
+                stopLaunching(),
+                stopFeeding()
+        );
+    }
+
+
+
     public void correctTurret() {
+        aim.update();
         double error = aim.getXDegrees();
         // if negative move to the left
         // if positive move to the right
@@ -127,17 +184,17 @@ public class LauncherPackage {
         correctTurret();
 
         if (gamepad.yWasPressed()) {
-            if (goLaunch.isScheduled()) {
+            if (teleGoLaunch.isScheduled()) {
                 telemetry.addLine("goLaunch has been scheduled");
             } else {
-                goLaunch.schedule();
+                teleGoLaunch.schedule();
 //                Scheduler.schedule(goLaunch);
                 telemetry.addLine("schedule goLaunch");
             }
         }
         if(gamepad.xWasPressed()) {
-            if(goLaunch.isScheduled()) {
-                goLaunch.cancel();
+            if(teleGoLaunch.isScheduled()) {
+                teleGoLaunch.cancel();
             }
             launcher.setVelocity(0);
             feeder.setPower(0);

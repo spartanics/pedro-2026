@@ -4,14 +4,17 @@ import com.pedropathing.api.Paths;
 
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.ivy.groups.Groups;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.groups.Groups.deadline;
 import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
+import static com.pedropathing.ivy.groups.Groups.loop;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -26,19 +29,23 @@ public class AutoPathBlue extends LinearOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(104.4382, 133.0878, 90);
-    private final Pose point1 = poseFactory.of(82.9835, 133.637, 0);
-    private final Pose point1Segment1Start = poseFactory.of(82.9835, 133.637, 0);
-    private final Pose point1Segment1End = poseFactory.of(82.9835, 133.637, 0);
-    private final Pose point2 = poseFactory.of(82.8114, 115.3467, 89.461);
+    private final Pose start = poseFactory.of(80.9651, 132.5555, 90);
+    private final Pose bLuepath = poseFactory.of(114.9433, 78.2552, 90);
+    private final Pose bLuepathControl1 = poseFactory.of(111.9018, 109.2997, 0);
+    private final Pose point2Start = poseFactory.of(114.9433, 78.2552, 90);
+    private final Pose point2 = poseFactory.of(130.654, 26.8795, 180);
 
 
     // Autonomous routine
     public Command autoRoutine() {
-        return sequential(
-                follow(follower, path1()),
-                launcher.totalLaunch(),
-                follow(follower, path2())
+        return deadline(
+                sequential(
+                        launcher.autoTotalLaunch(),
+                        follow(follower, bluePath()),
+                        follow(follower, path2())
+                ),
+                Groups.loop(launcher.turretCorrecting())
+
         );
     }
 
@@ -73,12 +80,12 @@ public class AutoPathBlue extends LinearOpMode {
         }
     }
 
-    public Path path1() {
-        return Paths.line(start, point1).heading(Interpolator.piecewise().until(1, Interpolator.linear(point1Segment1Start, point1Segment1End)));
+    public Path bluePath() {
+        return Paths.curve(start, bLuepathControl1, bLuepath).linear(start, bLuepath);
     }
 
     public Path path2() {
-        return Paths.line(point1, point2).reverseTangent();
+        return Paths.line(point2Start, point2).linear(point2Start, point2);
     }
 
 
