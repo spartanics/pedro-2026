@@ -24,7 +24,7 @@ public class TeleYohan extends LinearOpMode {
     public void runOpMode() {
 
         while(teleopMode == Constants.TeleopMode.NOT_SET) {
-            telemetry.addLine("Press x for blue, y for red");
+            telemetry.addLine("Press x for blue, and y for red");
             telemetry.update();
             if(gamepad1.xWasPressed()) {
                 teleopMode = Constants.TeleopMode.BLUE;

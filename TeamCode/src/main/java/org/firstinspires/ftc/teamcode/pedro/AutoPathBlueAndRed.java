@@ -10,29 +10,26 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
 import static com.pedropathing.ivy.Scheduler.schedule;
-import static com.pedropathing.ivy.commands.Commands.instant;
 import static com.pedropathing.ivy.groups.Groups.deadline;
-import static com.pedropathing.ivy.groups.Groups.parallel;
 import static com.pedropathing.ivy.groups.Groups.sequential;
-import static com.pedropathing.ivy.groups.Groups.loop;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.pedropathing.paths.interpolator.Interpolator;
 
 @Autonomous
-public class AutoPathBlue extends LinearOpMode {
+public class AutoPathBlueAndRed extends LinearOpMode {
 
     private Follower follower;
     private LauncherPackage launcher;
     private Aim aim;
+    private Constants.TeleopMode teleopMode = Constants.TeleopMode.NOT_SET;
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(80.9651, 132.5555, 90);
-    private final Pose bLuepath = poseFactory.of(114.9433, 78.2552, 90);
+    private final Pose start = poseFactory.of(80.9651, 132.5555, 270);
+    private final Pose bLuepath = poseFactory.of(114.9433, 78.2552, 270);
     private final Pose bLuepathControl1 = poseFactory.of(111.9018, 109.2997, 0);
-    private final Pose point2Start = poseFactory.of(114.9433, 78.2552, 90);
+    private final Pose point2Start = poseFactory.of(114.9433, 78.2552, 270);
     private final Pose point2 = poseFactory.of(130.654, 26.8795, 180);
 
 
@@ -51,8 +48,18 @@ public class AutoPathBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        aim = new Aim(hardwareMap, telemetry, Constants.TeleopMode.BLUE);
-        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim, Constants.TeleopMode.BLUE);
+        while(teleopMode == Constants.TeleopMode.NOT_SET) {
+            if (gamepad1.yWasPressed()) {
+                teleopMode = Constants.TeleopMode.RED;
+            }
+            if (gamepad1.xWasPressed()) {
+                teleopMode = Constants.TeleopMode.BLUE;
+            }
+            telemetry.addLine("Press x for blue, and y for red");
+            telemetry.update();
+        }
+        aim = new Aim(hardwareMap, telemetry, teleopMode);
+        launcher = new LauncherPackage(hardwareMap, gamepad1, telemetry, aim, teleopMode);
         Scheduler.reset();
         follower = Constants.create(hardwareMap);
         follower.setPose(start);

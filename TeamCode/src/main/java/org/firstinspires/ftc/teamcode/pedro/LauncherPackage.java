@@ -64,10 +64,10 @@ public class LauncherPackage {
     public Command stopLaunching() {
         return Command.build()
                 .setStart(() -> {
-                    // executed on start
+                    launcher.setVelocity(0);
                 })
                 .setExecute(() -> {
-                    launcher.setVelocity(0);
+
                 })
                 .setDone(() -> {
                     // return true to end the command
@@ -159,7 +159,7 @@ public class LauncherPackage {
                 //rotating(),
                 launching(),
                 feeding(),
-                waitMs(5000),
+                waitMs(20000),
                 stopLaunching(),
                 stopFeeding()
         );
