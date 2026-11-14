@@ -39,7 +39,13 @@ public class Aim {
 
 
     public void update() {
-        limelight.pipelineSwitch(0);
+        if (this.teleopMode == Constants.TeleopMode.RED ) {
+            limelight.pipelineSwitch(2);
+        }
+        if (this.teleopMode == Constants.TeleopMode.BLUE) {
+            limelight.pipelineSwitch(0);
+        }
+
         getRelativePosition();
     }
 
@@ -71,6 +77,7 @@ public class Aim {
             difference[0] = x = result.getTx(); // How far left or right the target is (degrees)
             difference[1] = y = result.getTy(); // How far up or down the target is (degrees)
             difference[2] = z = result.getTa(); // How big the target looks (0%-100% of the image)
+
 
             telemetry.addData("Target X", difference[0]);
             telemetry.addData("Target Y", difference[1]);

@@ -8,21 +8,30 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class IntakePackage {
     DcMotor intake;
+    Servo flower;
     Telemetry telemetry;
     Gamepad gamepad;
     Command runIntakeFor;
     public IntakePackage(HardwareMap hardwareMap, Gamepad gamepad, Telemetry telemetry) {
         this.intake = hardwareMap.get(DcMotorEx.class,"intake");
+        this.flower = hardwareMap.get(Servo.class, "flower");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
     }
 
     public void update() {
         intake.setPower(gamepad.right_trigger - gamepad.left_trigger);
+        if(gamepad.rightBumperWasPressed()) {
+            flower.setPosition(1);
+        } else if(gamepad.leftBumperWasPressed()) {
+            flower.setPosition(0);
+        }
+
         telemetry.addData("Intake Power", intake.getPower());
     }
 
@@ -46,6 +55,24 @@ public class IntakePackage {
                 })
                 .setEnd((endCondition) -> {
                     intake.setPower(0);
+                });
+
+    }
+
+    public Command runFlower() {
+
+        return Command.build()
+                .setStart(() -> {
+                    // executed on start
+                    flower.setPosition(1);
+                })
+                .setExecute(() -> {
+                })
+                .setDone(() -> {
+                    return gamepad.rightBumperWasPressed();
+                })
+                .setEnd((endCondition) -> {
+                    flower.setPosition(0);
                 });
 
     }
