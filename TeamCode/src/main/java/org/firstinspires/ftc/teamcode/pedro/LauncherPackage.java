@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
 import static com.pedropathing.ivy.commands.Commands.waitMs;
+import static com.pedropathing.ivy.groups.Groups.deadline;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.pedropathing.ivy.Command;
@@ -18,6 +19,7 @@ public class LauncherPackage {
     private DcMotorEx launcher;
     private Servo hood;
     private Servo turret;
+    private Servo angular;
     private CRServo feeder;
     private CRServo back_feed;
     private double velocity = 1700;
@@ -35,6 +37,7 @@ public class LauncherPackage {
         this.turret = hardwareMap.get(Servo.class, "turret");
         this.feeder = hardwareMap.get(CRServo.class, "feeder");
         this.back_feed = hardwareMap.get(CRServo.class, "back_feed");
+        this.angular = hardwareMap.get(Servo.class, "angular");
         this.gamepad = gamepad;
         this.telemetry = telemetry;
         this.aim = aim;
@@ -42,9 +45,24 @@ public class LauncherPackage {
         this.teleGoLaunch = totalLaunch();
         turret.setDirection(Servo.Direction.REVERSE);
         turret.setPosition(.5);
+        this.angular.setPosition(0.5);
         back_feed.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
+    }
+
+    public Command angle() {
+        return Command.build()
+                .setStart(() -> {
+                    // executed on start
+                })
+                .setExecute(() -> {
+                    angular.setPosition(0.5);
+                })
+                .setDone(() -> {
+                    // return true to end the command
+                    return true;
+                });
     }
 
     public Command launching() {
@@ -75,31 +93,6 @@ public class LauncherPackage {
                 });
     }
 
-    /*public Command rotating() {
-        return Command.build()
-                .setStart(() -> {
-                    // executed on start
-                    // call aim.getRelativePosition() to get the x, y, z
-                    double[] currentPose = aim.getRelativePosition();
-
-                })
-                .setExecute(() -> {
-                    aim.getRelativePosition();
-                    // move to the turret
-//                Aim.hone(); //centers the hive into the middle
-                })
-                .setDone(() -> {
-                    // return true to end the command
-                    // when getRelativePosition() is within tolerance
-                    if(Math.abs(aim.getXDegrees()) < 5) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-//                return Aim.aligned(); //return true when aim is centered
-                });
-    }*/
 
     public Command feeding() {
         return Command.build()
@@ -146,11 +139,14 @@ public class LauncherPackage {
     }
 
     public Command totalLaunch() {
-        return sequential(
-                //rotating(),
-                launching(),
-                feeding()
-                //waitMs(5000)
+        return deadline(
+                    sequential(
+                        //rotating(),
+                        launching(),
+                        feeding()
+                        //waitMs(5000)
+            ),
+                angle()
         );
     }
 
@@ -170,6 +166,10 @@ public class LauncherPackage {
     public void correctTurret() {
         aim.update();
         double error = aim.getXDegrees();
+        //Xdegrees is relative to the april tag
+        //if(aprilTagIsSeen)
+        //straight - xDegrees
+        //Pose aprilPose = new Pose(xCoord, yCoord, );
         // if negative move to the left
         // if positive move to the right
         double k_p = 0.0005; //0.0001
@@ -182,6 +182,7 @@ public class LauncherPackage {
 
     public void update() {
         correctTurret();
+        angular.setPosition(0.5);
 
         if (gamepad.yWasPressed()) {
             if (teleGoLaunch.isScheduled()) {
@@ -199,6 +200,12 @@ public class LauncherPackage {
             launcher.setVelocity(0);
             feeder.setPower(0);
             back_feed.setPower(0);
+        }
+
+        if(gamepad.aWasPressed()) {
+
+            feeder.setPower(-1);
+            back_feed.setPower(1);
         }
 
         if (gamepad.dpadDownWasPressed()) {
